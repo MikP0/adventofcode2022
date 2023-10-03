@@ -1,41 +1,42 @@
 fn main() {
-    let mut points: u32 = 0;
-
     let mut lines = include_str!("input.txt").lines();
 
-    lines.for_each(|round: &str| {
+    let mut points = lines.fold(0, |mut sum: u32, round: &str| {
         match round.chars().nth(2).unwrap() {
-            'X' => points += 1,
-            'Y' => points += 2,
-            'Z' => points += 3,
+            'X' => sum += 1,
+            'Y' => sum += 2,
+            'Z' => sum += 3,
             _ => (),
         }
 
         match round {
-            "A X" | "B Y" | "C Z" => points += 3,
-            "C X" | "A Y" | "B Z" => points += 6,
+            "A X" | "B Y" | "C Z" => sum += 3,
+            "C X" | "A Y" | "B Z" => sum += 6,
             _ => (),
         }
+
+        sum
     });
 
     println!("Part 1: {}", points);
 
-    points = 0;
     lines = include_str!("input.txt").lines();
 
-    lines.for_each(|round: &str| {
+    points = lines.fold(0, |mut sum: u32, round: &str| {
         match round.chars().nth(2).unwrap() {
-            'Y' => points += 3,
-            'Z' => points += 6,
+            'Y' => sum += 3,
+            'Z' => sum += 6,
             _ => (),
         }
 
         match round {
-            "A Y" | "B X" | "C Z" => points += 1, // Rock
-            "A Z" | "B Y" | "C X" => points += 2, // Paper
-            "A X" | "B Z" | "C Y" => points += 3, // Scissors
+            "A Y" | "B X" | "C Z" => sum += 1, // Rock
+            "A Z" | "B Y" | "C X" => sum += 2, // Paper
+            "A X" | "B Z" | "C Y" => sum += 3, // Scissors
             _ => (),
         }
+
+        sum
     });
 
     println!("Part 2: {}", points);
