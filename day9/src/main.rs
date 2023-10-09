@@ -5,12 +5,9 @@ type Position = (i16, i16);
 fn main() {
     let moves = include_str!("./input.txt").lines();
 
-    let starting_position: Position = (0, 0);
     let mut tail_positions = HashSet::<Position>::new();
-    let mut tail_position = starting_position.clone();
-    let mut head_position = starting_position.clone();
 
-    let mut knots = vec![(0, 0); 10];
+    let mut knots = vec![(11, 15); 10];
 
     moves.for_each(|movement| {
         let mut split_movement = movement.split_ascii_whitespace();
@@ -22,68 +19,81 @@ fn main() {
             .parse::<u8>()
             .unwrap();
 
-        println!("{}", direction);
-
         for _ in 0..times {
-            let same_column = tail_position.0 == head_position.0;
-            let same_row = tail_position.1 == head_position.1;
-
             if direction == "L" {
-                head_position.0 -= 1;
-
-                let should_move = head_position.0 < (tail_position.0 - 1);
-                if same_row && !same_column && should_move {
-                    tail_position.0 -= 1;
-                }
-
-                if !same_column && !same_row && head_position.0 != tail_position.0 {
-                    tail_position = (head_position.0 + 1, head_position.1)
-                }
+                knots[0].0 -= 1;
             }
-
             if direction == "R" {
-                head_position.0 += 1;
-
-                let should_move = head_position.0 > (tail_position.0 + 1);
-                if same_row && !same_column && should_move {
-                    tail_position.0 += 1;
-                }
-
-                if !same_column && !same_row && head_position.0 != tail_position.0 {
-                    tail_position = (head_position.0 - 1, head_position.1)
-                }
+                knots[0].0 += 1;
             }
-
             if direction == "U" {
-                head_position.1 -= 1;
-
-                let should_move = head_position.1 < (tail_position.1 - 1);
-                if same_column && !same_row && should_move {
-                    tail_position.1 -= 1;
-                }
-
-                if !same_column && !same_row && head_position.1 != tail_position.1 {
-                    tail_position = (head_position.0, head_position.1 + 1)
-                }
+                knots[0].1 += 1;
             }
-
             if direction == "D" {
-                head_position.1 += 1;
+                knots[0].1 -= 1;
+            }
+            for index in 0..knots.len() - 1 {
+                let head_position = knots[index];
+                let tail_position = knots[index + 1];
 
-                let should_move = head_position.1 > (tail_position.1 + 1);
-                if same_column && !same_row && should_move {
-                    tail_position.1 += 1;
+                let prod = (
+                    head_position.0 - tail_position.0,
+                    head_position.1 - tail_position.1,
+                );
+
+                let mut tail_mod = tail_position.clone();
+
+                if prod == (-2, -2)
+                    || prod == (-1, -2)
+                    || prod == (-2, -1)
+                    || prod == (-2, 0)
+                    || prod == (-2, 1)
+                    || prod == (-1, 2)
+                    || prod == (-2, 2)
+                {
+                    tail_mod.0 -= 1;
                 }
 
-                if !same_column && !same_row && head_position.1 != tail_position.1 {
-                    tail_position = (head_position.0, head_position.1 - 1)
+                if prod == (1, 2)
+                    || prod == (2, 1)
+                    || prod == (2, 0)
+                    || prod == (2, -1)
+                    || prod == (1, -2)
+                    || prod == (2, 2)
+                    || prod == (2, -2)
+                {
+                    tail_mod.0 += 1;
+                }
+
+                if prod == (-2, 1)
+                    || prod == (-1, 2)
+                    || prod == (0, 2)
+                    || prod == (1, 2)
+                    || prod == (2, 1)
+                    || prod == (2, 2)
+                    || prod == (-2, 2)
+                {
+                    tail_mod.1 += 1;
+                }
+
+                if prod == (-2, -2)
+                    || prod == (2, -1)
+                    || prod == (1, -2)
+                    || prod == (0, -2)
+                    || prod == (-1, -2)
+                    || prod == (-2, -1)
+                    || prod == (2, -2)
+                {
+                    tail_mod.1 -= 1;
+                }
+
+                knots[index + 1] = tail_mod;
+                if index == knots.len() - 2 {
+                    tail_positions.insert(tail_mod);
                 }
             }
-
-            tail_positions.insert(tail_position);
-            println!("{:?} {:?}", head_position, tail_position);
         }
     });
 
-    println!("{:?}", tail_positions.len());
+    println!("Part 2: {:?}", tail_positions.len());
 }
